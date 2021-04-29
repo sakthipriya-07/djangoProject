@@ -1,5 +1,5 @@
 from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin
+
 
 from .models import User, Student
 
@@ -16,8 +16,6 @@ class UserAdmin(admin.ModelAdmin):
 class StudentAdmin(admin.ModelAdmin):
     list_display = ('full_name', 'program', 'grades', 'courses')
     list_filter = ('program', 'courses', 'grades')
-    save_as = True
-    save_on_top = True
     change_list_template = 'change_list_graph.html'
 
 
