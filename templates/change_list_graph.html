@@ -1,0 +1,81 @@
+{% extends "admin/change_list.html" %}
+{% load static %}
+{% block extrahead %}
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.0/Chart.min.js"></script>
+    <script>
+        var randomColorGenerator = function () {
+            return '#' + (Math.random().toString(16) + '0000000').slice(2, 8);
+        };
+        var options = {
+            responsive: true,
+            maintainAspectRatio: true,
+            legend: {
+                position: 'left'
+            },
+            title: {
+                display: true
+            },
+            animation: {
+                animateScale: true,
+                animateRotate: true
+            }
+        };
+        window.onload = function () {
+            var ctx = document.getElementById("program-chart");
+            {% regroup cl.queryset|dictsort:"program" by get_program_display as program_list %}
+            var lineChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: [{% for program in program_list %}'{{ program.grouper }}',{% endfor %}],
+                    datasets: [{
+                        data: [{% for program in program_list %}'{{ program.list|length }}',{% endfor %}],
+                        backgroundColor: [{% for program in program_list %}randomColorGenerator(),{% endfor %}]
+                    }]
+                },
+                options: options
+            });
+            ctx = document.getElementById("courses-chart");
+            {% regroup cl.queryset|dictsort:"grades" by grades as grades_list %}
+            lineChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: [{% for grade in grades_list %}'{{ grade.grouper }}',{% endfor %}],
+                    datasets: [{
+                        data: [{% for grade in grades_list %}'{{ grade.list|length }}',{% endfor %}],
+                        backgroundColor: [{% for grades in grades_list %}randomColorGenerator(),{% endfor %}]
+                    }]
+                }, options: options
+            });
+            ctx = document.getElementById("grades-chart");
+            {% regroup cl.queryset|dictsort:"courses" by get_courses_display as courses_list %}
+            lineChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: [{% for courses in courses_list %}'{{ courses.grouper }}',{% endfor %}],
+                    datasets: [{
+                        data: [{% for courses in courses_list %}'{{courses.list|length }}',{% endfor %}],
+                        backgroundColor: [{% for courses` in courses_list %}randomColorGenerator(),{% endfor %}]
+                    }]
+                }, options: options
+            });
+        }
+    </script>
+{% endblock %}
+{% block content %}
+    <h1> Graphs </h1>
+    <hr>
+    <div class="row">
+        <div class="col-sm-4">
+            <canvas id="courses-chart" style="width: 100px !important;"></canvas>
+        </div>
+        <div class="col-sm-4">
+            <canvas id="program-chart" style="width: 100px !important;"></canvas>
+        </div>
+        <div class="col-sm-4">
+            <canvas id="grades-chart" style="width: 100px !important;"></canvas>
+        </div>
+    </div>
+    {{ block.super }}
+{% endblock %}
