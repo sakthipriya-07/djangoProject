@@ -10,7 +10,7 @@ from .models import User, Student
 
 class UserAdmin(admin.ModelAdmin):
     model = User
-    list_display = ['username', 'is_patient', 'phone']
+    list_display = ['username',  'phone']
 
 
 class StudentAdmin(admin.ModelAdmin):
